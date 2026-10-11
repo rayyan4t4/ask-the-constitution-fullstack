@@ -1,0 +1,8 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+onnxruntime>=1.18
+faiss-cpu>=1.8
+numpy>=1.26
+requests>=2.31
+tokenizers>=0.19
+pydantic>=2.6
