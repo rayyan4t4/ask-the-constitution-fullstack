@@ -38,12 +38,21 @@ export default function App() {
     setState("searching");
     setAnswer(null); setSources([]); setNotice(null); setOpenSrc(null);
     try {
-      const res = await fetch(`${API}/ask`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: query }),
-        signal: ctl.signal,
-      });
+      let res;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        res = await fetch(`${API}/ask`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: query }),
+          signal: ctl.signal,
+        });
+        if (res.ok) break;
+        if (attempt === 0 && (res.status === 502 || res.status === 429)) {
+          await new Promise((r) => setTimeout(r, 4000));
+          continue;
+        }
+        break;
+      }
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.detail || `Server error ${res.status}`);
